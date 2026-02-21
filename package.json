@@ -1,0 +1,43 @@
+{
+  "name": "slack-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for searching Slack channels and messages",
+  "type": "module",
+  "main": "./build/index.js",
+  "bin": {
+    "slack-mcp": "./build/index.js"
+  },
+  "scripts": {
+    "build": "tsc && chmod 755 build/index.js",
+    "dev": "tsc --watch",
+    "start": "node build/index.js"
+  },
+  "files": [
+    "build"
+  ],
+  "keywords": [
+    "mcp",
+    "slack",
+    "search",
+    "channels",
+    "model-context-protocol",
+    "claude",
+    "anthropic"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nikhilchintawar/slack-mcp.git"
+  },
+  "homepage": "https://github.com/nikhilchintawar/slack-mcp#readme",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0",
+    "@slack/web-api": "^7.0.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}
