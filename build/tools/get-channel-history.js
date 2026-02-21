@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { getSlackClient } from '../utils/slack-client.js';
-import { getConfig } from '../utils/config.js';
+import { getConfig, validateChannel } from '../utils/config.js';
 export const getChannelHistorySchema = z.object({
     channel: z
         .string()
@@ -53,9 +53,14 @@ function mapMessage(msg, channelId) {
 export async function getChannelHistory(input) {
     const client = getSlackClient();
     const config = getConfig();
-    const channelId = input.channel ?? config.defaultChannel;
+    // Get channel from input or default, then validate against allowed list
+    const requestedChannel = input.channel ?? config.defaultChannel;
+    const channelId = validateChannel(requestedChannel);
     if (!channelId) {
-        throw new Error('Channel ID is required. Provide it as a parameter or set SLACK_DEFAULT_CHANNEL.');
+        const hint = config.allowedChannels?.length
+            ? ` Allowed channels: ${config.allowedChannels.join(', ')}`
+            : ' Set SLACK_DEFAULT_CHANNEL or SLACK_CHANNELS.';
+        throw new Error(`Channel ID is required.${hint}`);
     }
     const messages = [];
     let cursor;

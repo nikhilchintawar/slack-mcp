@@ -89,7 +89,24 @@ Then add to your config:
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `SLACK_BOT_TOKEN` | Yes | Slack Bot User OAuth Token |
+| `SLACK_CHANNELS` | No | Comma-separated list of allowed channels (restricts searches) |
 | `SLACK_DEFAULT_CHANNEL` | No | Default channel ID for operations |
+
+### Channel Restrictions
+
+Use `SLACK_CHANNELS` to restrict which channels can be searched. When configured:
+- Searches without a channel specified will search all allowed channels
+- Searches with a specific channel will validate it's in the allowed list
+- `get_channel_history` will only work with allowed channels
+
+```json
+{
+  "env": {
+    "SLACK_BOT_TOKEN": "xoxb-your-token",
+    "SLACK_CHANNELS": "general,engineering,support"
+  }
+}
+```
 
 ### Slack App Setup
 

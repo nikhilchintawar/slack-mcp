@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { getSlackClient } from '../utils/slack-client.js';
+import { getAllowedChannelsForSearch, validateChannel } from '../utils/config.js';
 import type { SearchResult, SlackMessage } from '../types.js';
 
 export const searchMessagesSchema = z.object({
@@ -60,12 +61,22 @@ function mapMessage(match: SlackSearchMatch): SlackMessage {
   };
 }
 
-function buildSearchQuery(input: SearchMessagesInput): string {
+function buildSearchQuery(input: SearchMessagesInput, channels?: string[]): string {
   const parts: string[] = [input.query];
 
+  // If specific channel provided, validate and use it
   if (input.channel) {
-    parts.push(`in:${input.channel}`);
+    const validatedChannel = validateChannel(input.channel);
+    if (validatedChannel) {
+      parts.push(`in:${validatedChannel}`);
+    }
+  } else if (channels && channels.length > 0) {
+    // If no channel specified but allowed channels configured, search all allowed channels
+    for (const channel of channels) {
+      parts.push(`in:${channel}`);
+    }
   }
+
   if (input.from) {
     parts.push(`from:${input.from}`);
   }
@@ -83,7 +94,8 @@ export async function searchMessages(
   input: SearchMessagesInput
 ): Promise<SearchResult> {
   const client = getSlackClient();
-  const query = buildSearchQuery(input);
+  const allowedChannels = getAllowedChannelsForSearch();
+  const query = buildSearchQuery(input, allowedChannels);
 
   const response = await client.search.messages({
     query,
