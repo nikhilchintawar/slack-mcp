@@ -5,7 +5,7 @@ A Model Context Protocol (MCP) server for searching Slack channels and messages.
 ## Features
 
 - **list_channels** - List available Slack channels in the workspace
-- **search_messages** - Search for messages across channels using Slack's search syntax
+- **search_messages** - Search for messages across channels using text matching
 - **get_channel_history** - Get message history from a specific channel
 
 ## Installation
@@ -115,11 +115,11 @@ Use `SLACK_CHANNELS` to restrict which channels can be searched. When configured
 3. Add the following Bot Token Scopes:
    - `channels:read` - List public channels
    - `channels:history` - Read messages from public channels
-   - `search:read` - Search messages and files
    - `groups:read` - List private channels (optional)
    - `groups:history` - Read messages from private channels (optional)
 4. Install the app to your workspace
 5. Copy the "Bot User OAuth Token" (starts with `xoxb-`)
+6. **Important:** Add the bot to each channel you want to search (right-click channel → "Open channel details" → "Integrations" → "Add apps")
 
 ## Usage Examples
 
@@ -145,18 +145,20 @@ List available Slack channels in the workspace.
 
 ### `search_messages`
 
-Search for messages across Slack channels using query syntax.
+Search for messages across Slack channels using text matching. Fetches channel history and filters by query.
 
 | Parameter | Required | Description |
 |-----------|----------|-------------|
-| `query` | Yes | Search query string |
-| `channel` | No | Channel ID or name to search in |
-| `from` | No | Filter by sender username |
-| `after` | No | Search messages after date (YYYY-MM-DD) |
-| `before` | No | Search messages before date (YYYY-MM-DD) |
+| `query` | Yes | Search text (case-insensitive). Use `\|` for OR, spaces for AND |
+| `channel` | No | Channel ID or name. If not set, searches all `SLACK_CHANNELS` |
+| `after` | No | Search messages after date (YYYY-MM-DD or ISO 8601) |
+| `before` | No | Search messages before date (YYYY-MM-DD or ISO 8601) |
 | `limit` | No | Max results (default: 20, max: 100) |
-| `sortBy` | No | `relevance` or `timestamp` (default: relevance) |
-| `sortDir` | No | `asc` or `desc` (default: desc) |
+
+**Query examples:**
+- `error` - messages containing "error"
+- `error warning` - messages containing both "error" AND "warning"
+- `error | warning` - messages containing "error" OR "warning"
 
 ### `get_channel_history`
 
